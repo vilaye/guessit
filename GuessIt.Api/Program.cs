@@ -11,6 +11,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks();
 
+// Blazor Server + DevExpress
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+builder.Services.AddDevExpressBlazor();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+
 // MongoDB mit automatischem Fallback auf In-Memory
 var mongoSettings = builder.Configuration
     .GetSection(MongoDbSettings.SectionName)
@@ -60,7 +66,12 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors();
+app.UseStaticFiles();
+app.UseAntiforgery();
+
 app.MapControllers();
 app.MapHealthChecks("/health");
+app.MapRazorComponents<GuessIt.Api.Components.App>()
+    .AddInteractiveServerRenderMode();
 
 app.Run();

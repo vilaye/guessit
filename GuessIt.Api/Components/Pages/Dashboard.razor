@@ -1,0 +1,100 @@
+@page "/dashboard"
+@inject IDashboardService DashboardService
+
+<div class="dashboard">
+    <h1 class="dashboard-title">GuessIt Statistiken</h1>
+
+    @if (_data is not null)
+    {
+        <!-- Summary Cards -->
+        <div class="summary-row">
+            <div class="summary-card">
+                <span class="card-value">@_data.TotalGames</span>
+                <span class="card-label">Spiele gesamt</span>
+            </div>
+            <div class="summary-card">
+                <span class="card-value">@_data.AverageAttempts.ToString("F1")</span>
+                <span class="card-label">Durchschnitt Versuche</span>
+            </div>
+            <div class="summary-card">
+                <span class="card-value">@_data.AverageDuration.ToString(@"mm\:ss")</span>
+                <span class="card-label">Durchschnitt Zeit</span>
+            </div>
+            <div class="summary-card highlight-green">
+                <span class="card-value">@_data.FastestWin.ToString(@"mm\:ss")</span>
+                <span class="card-label">Schnellster Sieg</span>
+            </div>
+            <div class="summary-card highlight-blue">
+                <span class="card-value">@_data.LeastAttempts</span>
+                <span class="card-label">Wenigste Versuche</span>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row">
+            <div class="chart-card">
+                <h2>Versuche pro Schwierigkeit</h2>
+                <DxChart Data="@_data.DifficultyStats" T="DifficultyStats">
+                    <DxChartBarSeries T="DifficultyStats"
+                                      TArgument="string"
+                                      TValue="double"
+                                      ArgumentField="s => s.Label"
+                                      ValueField="s => s.AverageAttempts"
+                                      Name="Durchschnitt Versuche"
+                                      Color="System.Drawing.Color.FromArgb(52, 152, 219)" />
+                    <DxChartArgumentAxis />
+                    <DxChartValueAxis />
+                    <DxChartTooltip Enabled="true" />
+                    <DxChartLegend Visible="false" />
+                </DxChart>
+            </div>
+
+            <div class="chart-card">
+                <h2>Zeit pro Schwierigkeit</h2>
+                <DxChart Data="@_data.DifficultyStats" T="DifficultyStats">
+                    <DxChartBarSeries T="DifficultyStats"
+                                      TArgument="string"
+                                      TValue="double"
+                                      ArgumentField="s => s.Label"
+                                      ValueField="s => s.AverageSeconds"
+                                      Name="Durchschnitt Sekunden"
+                                      Color="System.Drawing.Color.FromArgb(230, 126, 34)" />
+                    <DxChartArgumentAxis />
+                    <DxChartValueAxis />
+                    <DxChartTooltip Enabled="true" />
+                    <DxChartLegend Visible="false" />
+                </DxChart>
+            </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard-card">
+            <h2>Bestenliste</h2>
+            <DxGrid Data="@_data.Leaderboard"
+                    PageSize="10"
+                    PagerVisible="true"
+                    ShowFilterRow="false">
+                <Columns>
+                    <DxGridDataColumn FieldName="Rank" Caption="#" Width="60px" />
+                    <DxGridDataColumn FieldName="Difficulty" Caption="Schwierigkeit" />
+                    <DxGridDataColumn FieldName="Attempts" Caption="Versuche" Width="100px" />
+                    <DxGridDataColumn FieldName="DurationFormatted" Caption="Zeit" Width="100px" />
+                    <DxGridDataColumn FieldName="CompletedAt" Caption="Datum" DisplayFormat="dd.MM.yyyy HH:mm" />
+                </Columns>
+            </DxGrid>
+        </div>
+    }
+    else
+    {
+        <p class="loading">Lade Statistiken...</p>
+    }
+</div>
+
+@code {
+    private DashboardData? _data;
+
+    protected override void OnInitialized()
+    {
+        _data = DashboardService.GetDashboardData();
+    }
+}
