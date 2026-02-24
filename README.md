@@ -1,17 +1,24 @@
 # GuessIt
 
-Ein Zahlenratespiel mit WPF-Desktop-App, REST-API und MongoDB-Persistenz.
+Ein Zahlenratespiel mit WPF-Desktop-App, REST-API, MongoDB-Persistenz und Statistik-Dashboard.
+
+## Live-Demo
+
+- **Dashboard:** [guessit-api.azurewebsites.net/dashboard](https://guessit-api.azurewebsites.net/dashboard)
+- **Swagger API:** [guessit-api.azurewebsites.net/swagger](https://guessit-api.azurewebsites.net/swagger)
+- **API Sessions:** [guessit-api.azurewebsites.net/api/statistics/sessions](https://guessit-api.azurewebsites.net/api/statistics/sessions)
 
 ## Architektur
 
 ```
 GuessIt.App      WPF Desktop-App (MVVM)       → Spiel-UI
-GuessIt.Api      ASP.NET Core Web API          → Statistik-Endpunkte
+GuessIt.Api      ASP.NET Core Web API          → Statistik-Endpunkte + Dashboard
 GuessIt.Shared   Class Library                 → Gemeinsame Models
 ```
 
 - **Frontend:** WPF mit MVVM-Pattern (ViewModel, Commands, Converter)
 - **Backend:** ASP.NET Core Web API mit Swagger-Dokumentation
+- **Dashboard:** Blazor Server mit DevExpress Charts und Grid
 - **Datenbank:** MongoDB (mit automatischem Fallback auf In-Memory-Speicher)
 - **Hosting:** Azure App Service + MongoDB Atlas
 
@@ -47,6 +54,16 @@ Ohne MongoDB-Installation startet die API mit **In-Memory-Speicher** — alle Fe
 2. MongoDB starten (Standard: `localhost:27017`)
 3. API starten — verbindet sich automatisch
 
+## Dashboard
+
+Das Statistik-Dashboard ist unter `/dashboard` erreichbar und zeigt:
+
+- **Summary-Cards** — Gesamtzahl Spiele, durchschnittliche Versuche und Zeit, schnellster Sieg
+- **Bar-Charts** — Durchschnittliche Versuche und Zeit pro Schwierigkeit (Leicht/Mittel/Schwer)
+- **Bestenliste** — Top-Siege sortiert nach schnellster Zeit
+
+Gebaut mit DevExpress Blazor (DxChart, DxGrid) und Blazor Server direkt im API-Projekt.
+
 ## API-Endpunkte
 
 | Methode | Endpunkt | Beschreibung |
@@ -56,6 +73,7 @@ Ohne MongoDB-Installation startet die API mit **In-Memory-Speicher** — alle Fe
 | `GET`   | `/api/statistics/sessions` | Alle Spielsessions abrufen |
 | `GET`   | `/api/statistics/sessions/{id}/attempts` | Rateversuche einer Session |
 | `GET`   | `/health` | Health Check |
+| `GET`   | `/dashboard` | Statistik-Dashboard |
 
 Swagger-UI: [localhost:5000/swagger](http://localhost:5000/swagger)
 
@@ -71,6 +89,8 @@ Swagger-UI: [localhost:5000/swagger](http://localhost:5000/swagger)
 - .NET 10 / C# 14
 - WPF (Windows Presentation Foundation)
 - ASP.NET Core Web API
+- Blazor Server
+- DevExpress Blazor (Charts, Grid)
 - MongoDB (mit In-Memory-Fallback)
 - Azure App Service
 - Swagger / OpenAPI
