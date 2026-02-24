@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="GuessIt.Api/GuessIt.Api.csproj" />
+  <Project Path="GuessIt.App/GuessIt.App.csproj" />
+  <Project Path="GuessIt.Shared/GuessIt.Shared.csproj" />
+</Solution>
