@@ -58,3 +58,7 @@ logs/
 .env
 *.env
 appsettings.Local.json
+**/appsettings.json
+
+## Deploy artifacts
+*.zip
