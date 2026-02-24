@@ -3,12 +3,12 @@ using MongoDB.Driver;
 
 namespace GuessIt.Api.Services;
 
-public class StatisticsService : IStatisticsService
+public class MongoStatisticsService : IStatisticsService
 {
     private readonly IMongoCollection<GameSession> _sessions;
     private readonly IMongoCollection<GuessAttempt> _attempts;
 
-    public StatisticsService(IMongoDatabase database)
+    public MongoStatisticsService(IMongoDatabase database)
     {
         _sessions = database.GetCollection<GameSession>("sessions");
         _attempts = database.GetCollection<GuessAttempt>("attempts");

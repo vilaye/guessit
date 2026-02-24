@@ -11,15 +11,38 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks();
 
-// MongoDB
+// MongoDB mit automatischem Fallback auf In-Memory
 var mongoSettings = builder.Configuration
     .GetSection(MongoDbSettings.SectionName)
-    .Get<MongoDbSettings>()!;
+    .Get<MongoDbSettings>();
 
-builder.Services.AddSingleton<IMongoClient>(new MongoClient(mongoSettings.ConnectionString));
-builder.Services.AddSingleton<IMongoDatabase>(sp =>
-    sp.GetRequiredService<IMongoClient>().GetDatabase(mongoSettings.DatabaseName));
-builder.Services.AddSingleton<IStatisticsService, StatisticsService>();
+if (mongoSettings is not null && !string.IsNullOrEmpty(mongoSettings.ConnectionString))
+{
+    try
+    {
+        var client = new MongoClient(mongoSettings.ConnectionString);
+        var database = client.GetDatabase(mongoSettings.DatabaseName);
+
+        // Verbindung testen
+        database.ListCollectionNames().FirstOrDefault();
+
+        builder.Services.AddSingleton<IMongoClient>(client);
+        builder.Services.AddSingleton<IMongoDatabase>(database);
+        builder.Services.AddSingleton<IStatisticsService, MongoStatisticsService>();
+
+        Console.WriteLine("MongoDB verbunden — Daten werden persistent gespeichert.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"MongoDB nicht erreichbar ({ex.Message}) — verwende In-Memory-Speicher.");
+        builder.Services.AddSingleton<IStatisticsService, InMemoryStatisticsService>();
+    }
+}
+else
+{
+    Console.WriteLine("Keine MongoDB-Konfiguration gefunden — verwende In-Memory-Speicher.");
+    builder.Services.AddSingleton<IStatisticsService, InMemoryStatisticsService>();
+}
 
 builder.Services.AddCors(options =>
 {
