@@ -8,7 +8,7 @@ public class StatisticsApiClient : IDisposable
 {
     private readonly HttpClient _httpClient;
 
-    public StatisticsApiClient(string baseUrl = "http://localhost:5000")
+    public StatisticsApiClient(string baseUrl = "https://guessit-api.azurewebsites.net")
     {
         _httpClient = new HttpClient { BaseAddress = new Uri(baseUrl) };
     }
