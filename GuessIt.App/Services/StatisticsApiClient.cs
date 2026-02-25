@@ -6,18 +6,36 @@ namespace GuessIt.App.Services;
 
 public class StatisticsApiClient : IDisposable
 {
-    private readonly HttpClient _httpClient;
+    private const string LocalUrl = "http://localhost:5000";
+    private const string AzureUrl = "https://guessit-api.azurewebsites.net";
 
-    public StatisticsApiClient(string baseUrl = "https://guessit-api.azurewebsites.net")
+    private readonly HttpClient _httpClient = new();
+    private Uri _baseUri = new(LocalUrl);
+
+    public StatisticsApiClient()
     {
-        _httpClient = new HttpClient { BaseAddress = new Uri(baseUrl) };
+        CheckLocalApiAsync();
+    }
+
+    private async void CheckLocalApiAsync()
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+            var response = await _httpClient.GetAsync($"{LocalUrl}/health", cts.Token);
+            response.EnsureSuccessStatusCode();
+        }
+        catch
+        {
+            _baseUri = new Uri(AzureUrl);
+        }
     }
 
     public async Task SendGuessAsync(GuessAttempt attempt)
     {
         try
         {
-            await _httpClient.PostAsJsonAsync("api/statistics/guess", attempt);
+            await _httpClient.PostAsJsonAsync(new Uri(_baseUri, "api/statistics/guess"), attempt);
         }
         catch (HttpRequestException)
         {
@@ -29,14 +47,13 @@ public class StatisticsApiClient : IDisposable
     {
         try
         {
-            await _httpClient.PostAsJsonAsync("api/statistics/session", session);
+            await _httpClient.PostAsJsonAsync(new Uri(_baseUri, "api/statistics/session"), session);
         }
         catch (HttpRequestException)
         {
             // API ist nicht erreichbar – Spiel läuft trotzdem weiter
         }
     }
-
     public void Dispose()
     {
         _httpClient.Dispose();
