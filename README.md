@@ -46,13 +46,7 @@ cd GuessIt.Api
 dotnet run
 ```
 
-Ohne MongoDB-Installation startet die API mit **In-Memory-Speicher** — alle Features funktionieren, Daten gehen aber beim Neustart verloren.
-
-### Mit lokaler MongoDB
-
-1. [MongoDB Community Edition](https://www.mongodb.com/try/download/community) installieren
-2. MongoDB starten (Standard: `localhost:27017`)
-3. API starten — verbindet sich automatisch
+Die API startet mit **In-Memory-Speicher** — alle Features funktionieren, Daten gehen aber beim Neustart verloren. In der Azure-Umgebung wird MongoDB Atlas für persistente Speicherung verwendet.
 
 ## Dashboard
 
