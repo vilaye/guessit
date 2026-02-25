@@ -25,11 +25,30 @@ public class GameViewModel : INotifyPropertyChanged
     private bool _isGameOver;
     private int _selectedDifficultyIndex;
     private string _guessHistory = string.Empty;
+    private string _apiStatusText = "Verbinde…";
+    private string _apiStatusColor = "#95A5A6";
 
     public GameViewModel()
     {
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _timer.Tick += (_, _) => UpdateElapsedTime();
+
+        _apiClient.ConnectionResolved += () =>
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                if (_apiClient.IsUsingAzure)
+                {
+                    ApiStatusText = "Azure";
+                    ApiStatusColor = "#3498DB";
+                }
+                else
+                {
+                    ApiStatusText = "Lokal";
+                    ApiStatusColor = "#27AE60";
+                }
+            });
+        };
 
         GuessCommand = new RelayCommand(_ => ExecuteGuess(), _ => CanGuess());
         NewGameCommand = new RelayCommand(_ => StartNewGame());
@@ -103,6 +122,18 @@ public class GameViewModel : INotifyPropertyChanged
     {
         get => _guessHistory;
         set { _guessHistory = value; OnPropertyChanged(); }
+    }
+
+    public string ApiStatusText
+    {
+        get => _apiStatusText;
+        set { _apiStatusText = value; OnPropertyChanged(); }
+    }
+
+    public string ApiStatusColor
+    {
+        get => _apiStatusColor;
+        set { _apiStatusColor = value; OnPropertyChanged(); }
     }
 
     private DifficultyOption CurrentDifficulty => Difficulties[_selectedDifficultyIndex];

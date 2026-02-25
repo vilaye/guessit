@@ -12,6 +12,10 @@ public class StatisticsApiClient : IDisposable
     private readonly HttpClient _httpClient = new();
     private Uri _baseUri = new(LocalUrl);
 
+    public bool IsUsingAzure { get; private set; }
+
+    public event Action? ConnectionResolved;
+
     public StatisticsApiClient()
     {
         CheckLocalApiAsync();
@@ -28,7 +32,9 @@ public class StatisticsApiClient : IDisposable
         catch
         {
             _baseUri = new Uri(AzureUrl);
+            IsUsingAzure = true;
         }
+        ConnectionResolved?.Invoke();
     }
 
     public async Task SendGuessAsync(GuessAttempt attempt)
@@ -54,6 +60,7 @@ public class StatisticsApiClient : IDisposable
             // API ist nicht erreichbar – Spiel läuft trotzdem weiter
         }
     }
+
     public void Dispose()
     {
         _httpClient.Dispose();

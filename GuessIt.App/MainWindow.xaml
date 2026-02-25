@@ -144,6 +144,20 @@
                     </ScrollViewer>
                 </StackPanel>
             </Border>
+
+        </StackPanel>
+
+        <!-- API-Status (fixiert unten rechts) -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Margin="0,0,4,0">
+            <Ellipse Width="10" Height="10"
+                     Fill="{Binding ApiStatusColor}"
+                     VerticalAlignment="Center"
+                     Margin="0,0,8,0" />
+            <TextBlock Text="{Binding ApiStatusText}"
+                       FontSize="13" Foreground="#95A5A6" />
         </StackPanel>
     </Grid>
 </Window>
